@@ -47,11 +47,11 @@ class Task1:
                         self._push_back_box(current_box)
                     else:
                         self._push_forward_box(current_box)
-                    stack.remove(current_box)  # убираем из стека ненужное значение, оно больше не влияет на решение
                 answer += 1  # энергии на загрузку
             else:  # команда выгрузить
                 boxes_move = len(self.sequence) - self.sequence.index(current_box) - 1
                 answer += boxes_move * 2 + 1  # энергии на разгрузку данного ящика
+                stack.remove(current_box)   # убираем из стека ненужное значение, оно больше не влияет на решение
                 self.sequence.remove(current_box)
 
         self._free()
