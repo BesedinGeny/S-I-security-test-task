@@ -1,13 +1,14 @@
 from typing import List, Tuple
 import math
 
+
 class Commands:
     """Команды программы"""
     get_box = "принять"
     remove_box = "выгрузить"
 
 
-def analyze(program: List[Tuple[str, int]]) -> int:
+class Task1:
     """
         Идея следующая: создадим стек из команд 'выгрузить' ->
         сформируем лучшую последовательность без лищних деталей ->
@@ -21,37 +22,52 @@ def analyze(program: List[Tuple[str, int]]) -> int:
         т.к. стек порядка n и комманд порядка n
 
     """
-    # TODO: добавить функции добавления в начало и в конец ленты ящика
+    sequence = []
 
-    stack = []
-    for command in program:
-        current_command = command[0]
-        current_box = command[1]
-        if current_command == Commands.remove_box:
-            stack.append(current_box)
+    def analyze(self, program: List[Tuple[str, int]]) -> int:
+        """решение задачи"""
+        stack = []
+        for command in program:  # последовательность выгрузки
+            current_command = command[0]
+            current_box = command[1]
+            if current_command == Commands.remove_box:
+                stack.append(current_box)
 
-    sequence = []  # формируемая последовательность ленты. индекс 0 - вход, len-1 - выход
-    answer = 0
-    for command in program:
-        current_command = command[0]
-        current_box = command[1]
-        if current_command == Commands.get_box:
-            if current_box not in stack:  # добавляем на вход ящик, который не выгрузят
-                sequence = [current_box] + sequence
-            else:  # если ящик в списке выгрузки
-                len_in_stack = stack.index(current_box)  # кол-во элементов в стеке перед данным элементом
-                if len(sequence) > len_in_stack:
-                    sequence += [current_box]
-                else:
-                    sequence = [current_box] + sequence
-                stack.remove(current_box)  # убираем из стека ненужное значение, оно больше не влияет на решение
-            answer += 1  # энергии на загрузку
-        else:  # команда выгрузить. тут надо просчитать ответ
-            boxes_move = len(sequence) - sequence.index(current_box) - 1
-            answer += boxes_move * 2 + 1  # энергии на разгрузку данного ящика
-            sequence.remove(current_box)
-        print(sequence)
-    return answer
+        # формируемая последовательность ленты. индекс 0 - вход, len-1 - выход
+        answer = 0
+        for command in program:
+            current_command = command[0]
+            current_box = command[1]
+            if current_command == Commands.get_box:
+                if current_box not in stack:  # добавляем на вход ящик, который не выгрузят
+                    self._push_forward_box(current_box)
+                else:  # если ящик в списке выгрузки
+                    len_in_stack = stack.index(current_box)  # кол-во элементов в стеке перед данным элементом
+                    if len(self.sequence) > len_in_stack:
+                        self._push_back_box(current_box)
+                    else:
+                        self._push_forward_box(current_box)
+                    stack.remove(current_box)  # убираем из стека ненужное значение, оно больше не влияет на решение
+                answer += 1  # энергии на загрузку
+            else:  # команда выгрузить
+                boxes_move = len(self.sequence) - self.sequence.index(current_box) - 1
+                answer += boxes_move * 2 + 1  # энергии на разгрузку данного ящика
+                self.sequence.remove(current_box)
+
+        self._free()
+        return answer
+
+    def _push_back_box(self, box):
+        """добавляем ящик на выход"""
+        self.sequence += [box]
+
+    def _push_forward_box(self, box):
+        """добавляем ящик на вход"""
+        self.sequence = [box] + self.sequence
+
+    def _free(self):
+        """обнуляем окружение класса, для возможного повторного использования"""
+        self.sequence = []
 
 
 class Checker:
